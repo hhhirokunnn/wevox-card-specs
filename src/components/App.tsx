@@ -1,14 +1,18 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import { AxiosResponse } from 'axios';
+import { LoginResponse } from '../interfaces/login';
+
+const TOKEN_KEY = 'jwt_token'
 
 const App: React.FC = () => {
 
-  const clickEvevent = (e: any) => {
+  const clickEvevent = (event: any) => {
     // ボタン押下時のsubmitを動作させない。
     // reloadを防ぐことができる。
-    e.preventDefault()
-    response(e)
+    event.preventDefault()
+    postLogin()
   }
   
 
@@ -35,16 +39,14 @@ const App: React.FC = () => {
   );
 }
 
-const response = async (e: any) => {
-  console.log(e)
-  await axios.post('http://localhost:9292/api/v1/login',
-  {
-    // params: {
+const postLogin: () => Promise<AxiosResponse<LoginResponse>> = async () => {
+  const response = await axios.post('http://localhost:9292/api/v1/login',
+    {
       user_name: 'hirokun',
       password: '123456',
-    // }
-  }
-  )
+    })
+    localStorage.setItem(TOKEN_KEY, response.data.preload.token);
+  return response
 }
 
 export default App;
