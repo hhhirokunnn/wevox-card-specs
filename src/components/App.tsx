@@ -1,7 +1,17 @@
 import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
 
 const App: React.FC = () => {
+
+  const clickEvevent = (e: any) => {
+    // ボタン押下時のsubmitを動作させない。
+    // reloadを防ぐことができる。
+    e.preventDefault()
+    response(e)
+  }
+  
+
   return (
     <div className= "container-fluid">
       <h4>Welcome to Wevox Card!</h4>
@@ -19,10 +29,22 @@ const App: React.FC = () => {
             </small>
         </div>
 
-        <button className="btn btn-primary"> Login</button>
+        <button className="btn btn-primary" onClick={clickEvevent}> Login</button>
       </form>
     </div>
   );
+}
+
+const response = async (e: any) => {
+  console.log(e)
+  await axios.post('http://localhost:9292/api/v1/login',
+  {
+    // params: {
+      user_name: 'hirokun',
+      password: '123456',
+    // }
+  }
+  )
 }
 
 export default App;
