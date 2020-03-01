@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
-
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { weboxAxios, TOKEN_KEY } from '../utils/weboxAxios';
-import { AxiosResponse } from 'axios';
-import { LoginResponse } from '../interfaces/login';
-import { Redirect } from 'react-router';
+
+import { useHistory } from "react-router-dom";
 
 const Login: React.FC = () => {
 
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
 
-  const clickEvevent = (event: any) => {
-    event.preventDefault()
-    postLogin(userName, password)
+  const history = useHistory()
+
+  const postLogin = async (userName: string, password: string) => {
+    await weboxAxios.post('login',
+      {
+        user_name: userName,
+        password: password,
+      }).then( response => {
+        localStorage.setItem(TOKEN_KEY, response.data.preload.token)
+        history.push("/");
+      }).catch( () => alert('WRONG LOGIN INFO') )
   }
   
   return (
@@ -33,26 +39,13 @@ const Login: React.FC = () => {
             </small>
         </div>
 
-        <button className="btn btn-primary" onClick={clickEvevent}> Login</button>
+        <button className="btn btn-primary" onClick={ e => {
+          e.preventDefault()
+          postLogin(userName, password)
+        }}> Login</button>
       </form>
     </div>
   );
-}
-
-const postLogin: (userName: string, password: string) => Promise<AxiosResponse<LoginResponse>> = async (userName: string, password: string) => {
-  const response = await weboxAxios.post('login',
-    {
-      user_name: userName,
-      password: password,
-    })
-    console.log(response)
-    if (response.status === 200) {
-      localStorage.setItem(TOKEN_KEY, response.data.preload.token);
-    }
-    else {
-      alert('missed login information.')
-    }
-  return response
 }
 
 export default Login;
